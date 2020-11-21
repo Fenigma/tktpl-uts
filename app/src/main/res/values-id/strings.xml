@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Gtroy</string>
+    <string name="knownHostTextView">Host Sebelumnya:</string>
+    <string name="ipv4LabelTextView">Alamat IPv4</string>
+    <string name="portNumberLabelTextView">Nomor Port</string>
+    <string name="ipv4HintExample">cth: 192.168.1.1</string>
+    <string name="loginHistoryText">Riwayat Login</string>
+    <string name="commandHistoryText">Riwayat Command</string>
+    <string name="connectButtonConnectedText">Terhubung</string>
+    <string name="connectButtonDisconnectedText">Terputus</string>
+    <string name="portNumberHintExample">cth: (1 - 65535)</string>
+    <string name="knownButtonText">Host Sebelumnya</string>
+    <string name="prefixToastOnCommandReceived">Mendapat Perintah: </string>
+</resources>

@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Gtroy</string>
+    <string name="knownHostTextView">Known Hosts:</string>
+    <string name="ipv4LabelTextView">IPv4 Address</string>
+    <string name="portNumberLabelTextView">Port Number</string>
+    <string name="ipv4HintExample">ex: 192.168.1.1</string>
+    <string name="loginHistoryText">Login History</string>
+    <string name="commandHistoryText">Command History</string>
+    <string name="connectButtonConnectedText">Connect</string>
+    <string name="connectButtonDisconnectedText">Disconnect</string>
+    <string name="portNumberHintExample">ex: (1 to 65535)</string>
+    <string name="knownButtonText">Known Host</string>
+    <string name="prefixToastOnCommandReceived">Got command: </string>
+</resources>
