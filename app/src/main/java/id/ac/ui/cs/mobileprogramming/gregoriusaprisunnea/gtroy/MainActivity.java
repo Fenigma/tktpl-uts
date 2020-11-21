@@ -92,16 +92,6 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-    @Override
-    protected void onStop() {
-        try {
-            unregisterReceiver(br);
-        } catch (Exception e) {
-            Log.i("ERROR", "[MainActivity] onDestroy can't unregister Receiver.");
-        }
-        super.onStop();
-    }
-
     private View.OnClickListener connectButtonClickHandler = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
