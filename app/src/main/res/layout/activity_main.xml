@@ -85,6 +85,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/connectButtonConnectedText"
                     android:textSize="30sp"
+                    android:background="@drawable/radius_button_1"
                     android:layout_gravity="center_vertical"/>
             </LinearLayout>
             <LinearLayout

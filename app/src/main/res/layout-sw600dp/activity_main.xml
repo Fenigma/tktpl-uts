@@ -81,6 +81,7 @@
                 android:layout_weight="1">
                 <Button
                     android:id="@+id/connectButton"
+                    android:background="@drawable/radius_button_2"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:text="@string/connectButtonConnectedText"
