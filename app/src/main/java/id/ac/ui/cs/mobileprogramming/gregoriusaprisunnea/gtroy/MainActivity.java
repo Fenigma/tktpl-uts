@@ -2,17 +2,24 @@ package id.ac.ui.cs.mobileprogramming.gregoriusaprisunnea.gtroy;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
+import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.Manifest;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -33,8 +40,11 @@ public class MainActivity extends AppCompatActivity {
     BackdoorService backdoorService;
     private boolean wideScreen;
 
+    private WifiManager wifiManager;
+
     int ACCESS_NETWORK_STATE_PERMISSION_CODE = 10;
     int INTERNET_PERMISSION_CODE = 20;
+    int READ_CONTACT_PERMISSION_CODE = 30;
 
     private BroadcastReceiver br = new BroadcastReceiver() {
         @Override
@@ -49,11 +59,16 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    NotificationManager notificationManager;
+    String notificationChannelId = "Gtroy";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         checkPermission(Manifest.permission.INTERNET, INTERNET_PERMISSION_CODE);
         checkPermission(Manifest.permission.ACCESS_NETWORK_STATE, ACCESS_NETWORK_STATE_PERMISSION_CODE);
+        checkPermission(Manifest.permission.READ_CONTACTS, READ_CONTACT_PERMISSION_CODE);
+
         // view binding
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -71,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
             binding.commandHistoryButton.setOnClickListener(commandHistoryButtonClickHandler);
             binding.KnownHostButton.setOnClickListener(knownHistoryButtonClickHandler);
             binding.loginHistoryButton.setOnClickListener(loginHistoryButtonClickHandler);
+            binding.startOpenGLButton.setOnClickListener(startOpenGLButtonOnClickHandler);
 
         }
         else {
@@ -83,6 +99,26 @@ public class MainActivity extends AppCompatActivity {
                         commit();
             }
             binding.connectButton.setOnClickListener(connectButtonClickHandler);
+        }
+        // Managers
+        wifiManager = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
+        notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
+        // wifi status
+        String wifi_status = "Wifi is disabled";
+        if (wifiManager.isWifiEnabled()) {
+            wifi_status = "Wifi is enabled";
+        }
+        binding.wifiStatusTextView.setText(wifi_status);
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+        {
+            NotificationChannel channel = new NotificationChannel(
+                    notificationChannelId,
+                    "Channel human readable title",
+                    NotificationManager.IMPORTANCE_HIGH);
+            notificationManager.createNotificationChannel(channel);
         }
     }
 
@@ -136,6 +172,15 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    private View.OnClickListener startOpenGLButtonOnClickHandler = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Intent i = new Intent(getApplicationContext(), OpenGLActivity.class);
+            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            getApplicationContext().startActivity(i);
+        }
+    };
+
     private void openFragment(Fragment fragment, boolean back_stack) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
@@ -147,10 +192,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public boolean checkPermission(String permission, int requestCode) {
+        Activity activity = (Activity) this;
         boolean have_access = true;
-        if (ContextCompat.checkSelfPermission(MainActivity.this, permission) == PackageManager.PERMISSION_DENIED) {
+        if (activity.checkSelfPermission(permission) == PackageManager.PERMISSION_DENIED) {
             have_access = false;
-            ActivityCompat.requestPermissions(MainActivity.this, new String[] { permission }, requestCode);
+            activity.requestPermissions(new String[] { permission }, requestCode);
         }
         return have_access;
     }
@@ -163,6 +209,11 @@ public class MainActivity extends AppCompatActivity {
             }
         } else if (requestCode == ACCESS_NETWORK_STATE_PERMISSION_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            }
+        } else if (requestCode == READ_CONTACT_PERMISSION_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            } else {
+                dialogContact();
             }
         }
     }
@@ -181,7 +232,37 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(MainActivity.this,R.string.prefixToastOnCommandReceived + command, Toast.LENGTH_SHORT);
         if (command != null && !command.equals("") && isConnected) {
             mainActivityViewModel.addCommandHistory(command);
+
+            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(getApplicationContext());
+            notificationBuilder.setContentTitle("Gtroy")
+                    .setChannelId(notificationChannelId)
+                    .setContentText("received command: " + command)
+                    .setSmallIcon(R.drawable.ic_launcher_foreground)
+                    .setAutoCancel(true);
+            notificationManager.notify(0, notificationBuilder.build());
         }
+    }
+
+    public void dialogContact() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("We can't read contacts, do you want to give us permission?")
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        checkPermission(Manifest.permission.READ_CONTACTS, READ_CONTACT_PERMISSION_CODE);
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        Toast. makeText(getApplicationContext(),"We need contact permission in order to run background services",Toast. LENGTH_LONG).show();
+                        dialog.dismiss();
+                        Intent i = new Intent(getApplicationContext(), PermissionDescriptionActivity.class);
+                        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        getApplicationContext().startActivity(i);
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
     }
 
 }
