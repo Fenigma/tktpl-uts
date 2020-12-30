@@ -1,8 +1,8 @@
 # tktpl-uts
-Projek ini digunakan untuk kepentingan UTS TKTPL. 
+Projek ini digunakan untuk kpengerjaan Tugas Akhir mata kuliah TKTPL 2020. 
 
 # Deskripsi dan penjelasan Proyek
-Deskripsi proyek ini bisa dilihat pada: [Deskripsi Proyek UTS](https://docs.google.com/document/d/18cVV50jBDqCf0Aeb5SPij5JOXwEgN-ZbJzWLf1vdhpw/edit ) [Deskripsi Proyek Akhir](https://docs.google.com/document/d/1obxKpY2i_acUdUKSB6aGzqJJyywtkMHLrne48CMLu5o/edit?usp=sharing)
+Deskripsi proyek ini bisa dilihat pada: [Laporan dan Deskripsi Proyek](https://docs.google.com/document/d/1AgQmuSkQFlZgrfrupEp0o6z9TbYMddDdh7kscK7Q1uU/edit?usp=sharing)
 
 # Identitas Pembuat Aplikasi
 Nama: Gregorius Aprisunnea
